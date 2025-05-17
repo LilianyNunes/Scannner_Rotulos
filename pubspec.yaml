@@ -1,0 +1,32 @@
+name: projeto_fapeg
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  permission_handler: ^11.0.1
+  camera: ^0.11.1
+  qr_flutter: ^4.1.0
+  cupertino_icons: ^1.0.8
+  url_launcher: ^6.0.10
+  google_mlkit_text_recognition: ^0.11.0
+  path_provider: ^2.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/logo_fapeg.png
+    - assets/logo_ifgoiano.png
+    - assets/dev_liliany.jpg

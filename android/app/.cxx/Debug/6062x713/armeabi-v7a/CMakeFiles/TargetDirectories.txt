@@ -1,0 +1,2 @@
+C:/Users/lilia/projeto_fapeg/android/app/.cxx/Debug/6062x713/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/lilia/projeto_fapeg/android/app/.cxx/Debug/6062x713/armeabi-v7a/CMakeFiles/rebuild_cache.dir

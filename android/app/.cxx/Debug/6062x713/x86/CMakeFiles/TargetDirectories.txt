@@ -1,0 +1,2 @@
+C:/Users/lilia/projeto_fapeg/android/app/.cxx/Debug/6062x713/x86/CMakeFiles/edit_cache.dir
+C:/Users/lilia/projeto_fapeg/android/app/.cxx/Debug/6062x713/x86/CMakeFiles/rebuild_cache.dir
