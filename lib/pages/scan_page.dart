@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:projeto_fapeg/pages/text_analyzer.dart';
+import 'package:string_similarity/string_similarity.dart';
+import 'package:diacritic/diacritic.dart';
 
 import 'setup_page.dart';
 import 'about_page.dart';
@@ -17,6 +20,7 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
   CameraController? _controller;
   bool _hasPermission = false;
   String _recognizedText = '';
+
 
   @override
   void initState() {
@@ -42,9 +46,7 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
   Future<void> _checkPermissionAfterSettings() async {
     final status = await Permission.camera.status;
     if (status.isGranted && !_hasPermission) {
-      setState(() {
-        _hasPermission = true;
-      });
+      setState(() => _hasPermission = true);
       _initializeCamera();
     }
   }
@@ -53,17 +55,13 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
     final status = await Permission.camera.status;
 
     if (status.isGranted) {
-      setState(() {
-        _hasPermission = true;
-      });
+      setState(() => _hasPermission = true);
       _initializeCamera();
     } else {
       final result = await Permission.camera.request();
 
       if (result.isGranted) {
-        setState(() {
-          _hasPermission = true;
-        });
+        setState(() => _hasPermission = true);
         _initializeCamera();
       } else if (result.isPermanentlyDenied) {
         await openAppSettings();
@@ -80,7 +78,7 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
         title: const Text('Permissão necessária'),
         content: const Text(
           'É necessário permitir o uso da câmera para escanear os rótulos. '
-          'Você será redirecionado para as configurações do aplicativo.',
+              'Você será redirecionado para as configurações do aplicativo.',
         ),
         actions: [
           TextButton(
@@ -109,6 +107,8 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
     setState(() {});
   }
 
+
+
   Future<void> _scanImage() async {
     if (_controller == null || !_controller!.value.isInitialized) return;
 
@@ -118,8 +118,14 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
       final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
       final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
 
+      final recognized = recognizedText.text;
+      final detectedWarnings = TextAnalyzer.checkFuzzyMatches(recognized);
       setState(() {
-        _recognizedText = recognizedText.text;
+        _recognizedText = ""; // Limpa antes
+
+        if (detectedWarnings.isNotEmpty) {
+          _recognizedText += '\n\nAvisos detectados:\n' + detectedWarnings.join('\n');
+        }
       });
 
       textRecognizer.close();
@@ -190,16 +196,15 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
                       ),
                       child: !_hasPermission
                           ? const Center(
-                              child: Text(
-                                'Permissão de câmera negada',
-                                style: TextStyle(color: Colors.red),
-                                textAlign: TextAlign.center,
-                              ),
-                            )
-                          : _controller != null &&
-                                  _controller!.value.isInitialized
-                              ? CameraPreview(_controller!)
-                              : const Center(child: CircularProgressIndicator()),
+                        child: Text(
+                          'Permissão de câmera negada',
+                          style: TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                          : _controller != null && _controller!.value.isInitialized
+                          ? CameraPreview(_controller!)
+                          : const Center(child: CircularProgressIndicator()),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -208,8 +213,7 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
                     icon: const Icon(Icons.camera_alt),
                     label: const Text('Iniciar escaneamento'),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -221,8 +225,7 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
                   if (_recognizedText.isNotEmpty) ...[
                     const Text(
                       'Texto reconhecido:',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Container(
